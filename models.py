@@ -7,10 +7,11 @@ class BatchRequestEntity(TableEntity):
         self["PartitionKey"] = partition_key
         self["RowKey"] = row_key
         self["ModelDeploymentName"] = model_deployment_name
-        self["ResponseJson"] = response_json
+        self["ResponseJson"] = str(response_json)
         self["Instructions"] = instructions
         self["Status"] = status
         self["FileNames"] = ",".join(file_names)
         self["BatchId"] = batch_id or ""
         self["Result"] = result or ""
         self["Created"] = datetime.utcnow().isoformat()
+

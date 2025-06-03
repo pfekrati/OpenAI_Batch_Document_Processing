@@ -14,10 +14,11 @@ load_dotenv()
 def get_table_client():
     service = TableServiceClient.from_connection_string(os.environ.get("STORAGE_CONNECTION_STRING"))
     table_client = service.get_table_client(table_name=os.environ.get("TABLE_NAME"))
+    # Check if table exists, create if it doesn't
     try:
         table_client.create_table()
     except Exception:
-        pass
+        logging.info("Table already exists or could not be created.")
     return table_client
 
 # Insert a new batch request
@@ -40,7 +41,7 @@ def insert_batch_request(model_deployment_name, response_json, instructions, fil
 def get_queued_requests(model_deployment_name):
     table_client = get_table_client()
     filter_str = f"PartitionKey eq '{model_deployment_name}' and Status eq 'queued'"
-    return list(table_client.query_entities(filter=filter_str))
+    return list(table_client.query_entities(query_filter=filter_str))
 
 # Update status and batch id
 def update_requests_to_processing(model_deployment_name, row_keys, batch_id):

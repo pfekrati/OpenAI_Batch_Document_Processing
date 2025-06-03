@@ -10,3 +10,6 @@ fitz
 openai
 openai-batch
 dotenv
+fastapi
+uvicorn
+python-multipart

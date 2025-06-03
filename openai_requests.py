@@ -83,7 +83,8 @@ def send_request(files, instructions, model_deployment_name, structuredOutputJso
     response = client.beta.chat.completions.parse(
         model=deployment_name,
         messages=messages,
-        response_format= structuredOutputJson
+        temperature=0,
+        response_format= { "type": "json_schema","json_schema": structuredOutputJson}
     )
     
     return response
@@ -105,13 +106,11 @@ def local_image_to_data_url(image_path):
 if __name__ == "__main__":
     # Example usage
     files = ["sample_files/2.png"]  
-    instructions = "Please analyze these images and extract first name, last name, date of birth and address from the images."
+    instructions = "Analyze these images and extract first name, last name, date of birth and address from the images."
     model_deployment_name = "gpt-4o"
     
     # Example of structured output format
-    structured_output_json = {
-        "type": "json_schema",
-        "json_schema": {
+    structured_output_json =  {
             "name": "Information_extract",
             "description": "Extracts personal information from documents",
             "strict": True,
@@ -139,8 +138,8 @@ if __name__ == "__main__":
                 "required": ["FirstName", "LastName", "DateOfBirth", "Address"]
             }
         }
-    }
     
     # Call the send_request function
     response = send_request(files, instructions, model_deployment_name, structured_output_json)
+    print("Response:", response)
     print("Response:", response.choices[0].message.content)
