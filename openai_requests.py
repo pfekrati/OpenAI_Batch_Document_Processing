@@ -49,7 +49,37 @@ def create_jsonl_and_upload(requests_list):
     
     return batch_ids
 
-def send_request(files, instructions, model_deployment_name, structuredOutputJson):
+def send_request(markdown:str, instructions:str, model_deployment_name:str, structuredOutputJson:dict, model_base_url=None, model_api_version=None, model_api_key=None):
+    # Use provided parameters or fall back to environment variables
+    api_base = model_base_url or os.getenv("OPENAI_ENDPOINT")
+    api_key = model_api_key or os.getenv("OPENAI_API_KEY")
+    api_version = model_api_version or os.getenv("OPENAI_API_VERSION")
+
+    client = AzureOpenAI(
+        api_key=api_key,
+        api_version=api_version,
+        base_url=f"{api_base}={api_version}"
+    )
+
+    userPrompt = {
+        "role": "user",
+        "content": f"{instructions}. markdown: {markdown}"
+    }
+
+    messages = [{"role": "system", "content": f"You are a helpful assistant that can extract information from a markdown document."}]
+    messages.append(userPrompt)
+
+    response = client.beta.chat.completions.parse(
+        model=model_deployment_name,
+        messages=messages,
+        temperature=0,
+        response_format={"type": "json_schema", "json_schema": structuredOutputJson}
+    )
+
+    return response
+
+
+def send_request_vision(files: list, instructions: str, model_deployment_name: str, structuredOutputJson: dict):
     api_base = os.getenv("OPENAI_ENDPOINT")
     api_key= os.getenv("OPENAI_API_KEY")
     deployment_name = model_deployment_name

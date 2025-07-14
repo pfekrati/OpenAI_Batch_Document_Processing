@@ -1,13 +1,11 @@
-from azure.data.tables import TableEntity
 from datetime import datetime
 
-class BatchRequestEntity(TableEntity):
-    def __init__(self, partition_key, row_key, model_deployment_name, response_json, instructions, status, file_names, batch_id=None, result=None):
+class BatchRequestEntity():
+    def __init__(self, model_deployment_name, response_json_schema, instructions, status, file_names, id=None, batch_id=None, result=None):
         super().__init__()
-        self["PartitionKey"] = partition_key
-        self["RowKey"] = row_key
+        self["Id"] = id or ""
         self["ModelDeploymentName"] = model_deployment_name
-        self["ResponseJson"] = str(response_json)
+        self["ResponseJsonSchema"] = str(response_json_schema)
         self["Instructions"] = instructions
         self["Status"] = status
         self["FileNames"] = ",".join(file_names)

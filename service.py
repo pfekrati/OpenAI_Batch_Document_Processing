@@ -1,4 +1,4 @@
-from batch_db import insert_batch_request, get_queued_requests
+from db import insert_batch_request, get_queued_requests
 
 def process_batch_request():
 

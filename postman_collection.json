@@ -1,0 +1,256 @@
+{
+    "info": {
+        "_postman_id": "document-processing-api-tests",
+        "name": "OpenAI Batch Document Processing API",
+        "description": "Collection for testing the OpenAI Batch Document Processing API endpoints",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Test 1: Basic document processing with image",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "files",
+                            "type": "file",
+                            "src": "./sample_files/2.png",
+                            "description": "Image file to process"
+                        },
+                        {
+                            "key": "deployment_name",
+                            "value": "gpt-4o",
+                            "type": "text"
+                        },
+                        {
+                            "key": "instructions",
+                            "value": "Extract the main topics and key points from the document. Provide a comprehensive summary.",
+                            "type": "text"
+                        },
+                        {
+                            "key": "schema",
+                            "value": "{\n    \"name\": \"Information_extract\",\n    \"description\": \"Extracts personal information from documents\",\n    \"strict\": true,\n    \"schema\": {\n        \"type\": \"object\",\n        \"properties\": {\n            \"FirstName\": {\n                \"type\": \"string\",\n                \"description\": \"The first name of the applicant\"\n            },\n            \"LastName\": {\n                \"type\": \"string\",\n                \"description\": \"The last name of the applicant\"\n            },\n            \"DateOfBirth\": {\n                \"type\": \"string\",\n                \"description\": \"The birth date of the applicant\"\n            },\n            \"Address\": {\n                \"type\": \"string\",\n                \"description\": \"The address of the applicant\"\n            }\n        },\n        \"additionalProperties\": false,\n        \"required\": [\"FirstName\", \"LastName\", \"DateOfBirth\", \"Address\"]\n    }\n}",
+                            "type": "text"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{base_url}}/process_document",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "process_document"
+                    ]
+                },
+                "description": "Test processing a single image file with personal information extraction schema"
+            }
+        },
+        {
+            "name": "Test 2: Multiple files processing",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "files",
+                            "type": "file",
+                            "src": "./document1.pdf",
+                            "description": "First document"
+                        },
+                        {
+                            "key": "files",
+                            "type": "file",
+                            "src": "./document2.docx",
+                            "description": "Second document"
+                        },
+                        {
+                            "key": "deployment_name",
+                            "value": "gpt-4o",
+                            "type": "text"
+                        },
+                        {
+                            "key": "instructions",
+                            "value": "Compare and analyze the content from multiple documents. Identify common themes and differences.",
+                            "type": "text"
+                        },
+                        {
+                            "key": "schema",
+                            "value": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"commonThemes\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      },\n      \"description\": \"Themes common across all documents\"\n    },\n    \"documentSummaries\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"filename\": {\n            \"type\": \"string\"\n          },\n          \"summary\": {\n            \"type\": \"string\"\n          },\n          \"uniquePoints\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"string\"\n            }\n          }\n        }\n      },\n      \"description\": \"Individual summaries for each document\"\n    },\n    \"overallAnalysis\": {\n      \"type\": \"string\",\n      \"description\": \"Overall analysis of all documents together\"\n    }\n  },\n  \"required\": [\"commonThemes\", \"documentSummaries\", \"overallAnalysis\"]\n}",
+                            "type": "text"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{base_url}}/process_document",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "process_document"
+                    ]
+                },
+                "description": "Test processing multiple documents and comparing their content"
+            }
+        },
+        {
+            "name": "Test 3: Financial document analysis",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "files",
+                            "type": "file",
+                            "src": "./financial_report.pdf",
+                            "description": "Financial report document"
+                        },
+                        {
+                            "key": "deployment_name",
+                            "value": "gpt-4o",
+                            "type": "text"
+                        },
+                        {
+                            "key": "instructions",
+                            "value": "Analyze this financial document and extract key financial metrics, trends, and insights.",
+                            "type": "text"
+                        },
+                        {
+                            "key": "schema",
+                            "value": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"financialMetrics\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"revenue\": {\n          \"type\": \"string\"\n        },\n        \"profit\": {\n          \"type\": \"string\"\n        },\n        \"expenses\": {\n          \"type\": \"string\"\n        }\n      }\n    },\n    \"trends\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      },\n      \"description\": \"Financial trends identified\"\n    },\n    \"riskFactors\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      },\n      \"description\": \"Identified risk factors\"\n    },\n    \"recommendations\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      },\n      \"description\": \"Strategic recommendations\"\n    }\n  },\n  \"required\": [\"financialMetrics\", \"trends\", \"riskFactors\", \"recommendations\"]\n}",
+                            "type": "text"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{base_url}}/process_document",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "process_document"
+                    ]
+                },
+                "description": "Test financial document analysis with specialized schema"
+            }
+        },
+        {
+            "name": "Test 4: Check API status",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        ""
+                    ]
+                },
+                "description": "Health check endpoint to verify API is running"
+            }
+        },
+        {
+            "name": "Test 5: Error test - Invalid JSON schema",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "files",
+                            "type": "file",
+                            "src": "./sample.pdf",
+                            "description": "Sample PDF file"
+                        },
+                        {
+                            "key": "deployment_name",
+                            "value": "gpt-4o",
+                            "type": "text"
+                        },
+                        {
+                            "key": "instructions",
+                            "value": "Extract topics from the document.",
+                            "type": "text"
+                        },
+                        {
+                            "key": "schema",
+                            "value": "{\n  \"type\": \"object\"\n  \"properties\": {\n    \"topics\": {\n      \"type\": \"array\"\n    }\n  }\n  // Missing commas - invalid JSON\n}",
+                            "type": "text",
+                            "description": "Intentionally invalid JSON to test error handling"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{base_url}}/process_document",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "process_document"
+                    ]
+                },
+                "description": "Test error handling with invalid JSON schema"
+            }
+        },
+        {
+            "name": "Test 6: Text file processing",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "files",
+                            "type": "file",
+                            "src": "./sample.txt",
+                            "description": "Text file for sentiment analysis"
+                        },
+                        {
+                            "key": "deployment_name",
+                            "value": "gpt-4o",
+                            "type": "text"
+                        },
+                        {
+                            "key": "instructions",
+                            "value": "Analyze the sentiment and extract entities from this text document.",
+                            "type": "text"
+                        },
+                        {
+                            "key": "schema",
+                            "value": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"sentiment\": {\n      \"type\": \"string\",\n      \"enum\": [\"positive\", \"negative\", \"neutral\"],\n      \"description\": \"Overall sentiment of the text\"\n    },\n    \"entities\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"name\": {\n            \"type\": \"string\"\n          },\n          \"type\": {\n            \"type\": \"string\",\n            \"enum\": [\"person\", \"organization\", \"location\", \"other\"]\n          }\n        }\n      },\n      \"description\": \"Named entities found in the text\"\n    },\n    \"confidence\": {\n      \"type\": \"number\",\n      \"minimum\": 0,\n      \"maximum\": 1,\n      \"description\": \"Confidence score for the analysis\"\n    }\n  },\n  \"required\": [\"sentiment\", \"entities\", \"confidence\"]\n}",
+                            "type": "text"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{base_url}}/process_document",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "process_document"
+                    ]
+                },
+                "description": "Test text file processing with sentiment analysis and entity extraction"
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000",
+            "type": "string"
+        }
+    ]
+}

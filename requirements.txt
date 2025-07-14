@@ -3,7 +3,6 @@
 # Manually managing azure-functions-worker may cause unexpected issues
 azure-functions
 azure-core
-azure-data-tables
 requests
 azure-storage-blob
 fitz
@@ -13,3 +12,5 @@ dotenv
 fastapi
 uvicorn
 python-multipart
+pyodbc
+azure-ai-formrecognizer
