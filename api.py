@@ -8,7 +8,7 @@ import tempfile
 import os
 from pydantic import BaseModel
 import shutil
-from openai_requests import send_request
+from openai_requests import send_request, send_request_vision
 import uvicorn
 from db import insert_batch_request, get_queued_requests, update_requests_to_processing, initialize_database
 from blob import upload_multiple_files, create_container
@@ -80,6 +80,68 @@ async def process_document(
         # Process the documents
         response = send_request(
             markdown=markdown,
+            instructions=instructions,
+            model_deployment_name=deployment_name,
+            structuredOutputJson=json_schema
+        )
+        
+        # Parse the response
+        if hasattr(response, 'choices') and response.choices:
+            result = json.loads(response.choices[0].message.content)
+            return JSONResponse(content=result)
+        else:
+            return JSONResponse(content={
+                "response": str(response)
+            })
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing documents: {str(e)}")
+    finally:
+        # Clean up temporary files
+        for file_path in temp_file_paths:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+@app.post(
+    "/process_document_vision", 
+    summary="Process documents with Azure AI Foundry Vision",
+    description="Upload documents to be processed by Azure AI Foundry Vision (requires a model compatible with Open AI SDK) according to provided instructions and schema",
+    response_model=Dict[str, Any],
+    responses={
+        200: {"description": "Successfully processed documents", "model": ProcessingResponse},
+        400: {"description": "Bad request", "model": ErrorResponse},
+        500: {"description": "Server error", "model": ErrorResponse}
+    }
+)
+async def process_document_vision(
+    files: List[UploadFile] = File(..., description="Documents to process"),
+    deployment_name: str = Form(..., description="Azure OpenAI model deployment name"),
+    instructions: str = Form(..., description="Instructions for processing the documents"),
+    schema: str = Form(..., description="JSON schema for structured output")
+):
+    # Validate inputs
+    if not files:
+        raise HTTPException(status_code=400, detail="No files provided")
+    
+    try:
+        # Parse the JSON schema
+        json_schema = json.loads(schema)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid JSON schema")
+    
+    # Save uploaded files temporarily
+    temp_file_paths = []
+    try:
+        for file in files:
+            file_path = os.path.join(TEMP_DIR, file.filename)
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+            temp_file_paths.append(file_path)
+    
+
+        # Process the documents
+        response = send_request_vision(
+            files=temp_file_paths,
             instructions=instructions,
             model_deployment_name=deployment_name,
             structuredOutputJson=json_schema
@@ -203,6 +265,6 @@ def custom_openapi():
 app.openapi = custom_openapi
 
 if __name__ == "__main__":
-    initialize_database() # Ensure the database is initialized
-    create_container("document-processing")  # Ensure the blob container exists
+    #initialize_database() # Ensure the database is initialized
+    #create_container("document-processing")  # Ensure the blob container exists
     uvicorn.run(app, host="0.0.0.0", port=8000)

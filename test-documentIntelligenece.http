@@ -1,0 +1,276 @@
+### Test 1: Basic document processing with PDF
+POST http://localhost:8000/process_document
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="files"; filename="2.png"
+Content-Type: image/png
+
+< ./sample_files/2.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="deployment_name"
+
+grok-3
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="instructions"
+
+Extract the main topics and key points from the document. Provide a comprehensive summary.
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="schema"
+
+{
+        "name": "Information_extract",
+        "description": "Extracts personal information from documents",
+        "strict": true,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "FirstName": {
+                    "type": "string",
+                    "description": "The first name of the applicant"
+                },
+                "LastName": {
+                    "type": "string",
+                    "description": "The last name of the applicant"
+                },
+                "DateOfBirth": {
+                    "type": "string",
+                    "description": "The birth date of the applicant"
+                },
+                "Address": {
+                    "type": "string",
+                    "description": "The address of the applicant"
+                }
+            },
+            "additionalProperties": false,
+            "required": ["FirstName", "LastName", "DateOfBirth", "Address"]
+        }
+    }
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### Test 2: Multiple files processing
+POST http://localhost:8000/process_document
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="files"; filename="document1.pdf"
+Content-Type: application/pdf
+
+< ./document1.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="files"; filename="document2.docx"
+Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+
+< ./document2.docx
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="deployment_name"
+
+gpt-4o
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="instructions"
+
+Compare and analyze the content from multiple documents. Identify common themes and differences.
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="schema"
+
+{
+  "type": "object",
+  "properties": {
+    "commonThemes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Themes common across all documents"
+    },
+    "documentSummaries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "uniquePoints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "Individual summaries for each document"
+    },
+    "overallAnalysis": {
+      "type": "string",
+      "description": "Overall analysis of all documents together"
+    }
+  },
+  "required": ["commonThemes", "documentSummaries", "overallAnalysis"]
+}
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### Test 3: Financial document analysis
+POST http://localhost:8000/process_document
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="files"; filename="financial_report.pdf"
+Content-Type: application/pdf
+
+< ./financial_report.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="deployment_name"
+
+gpt-4o
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="instructions"
+
+Analyze this financial document and extract key financial metrics, trends, and insights.
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="schema"
+
+{
+  "type": "object",
+  "properties": {
+    "financialMetrics": {
+      "type": "object",
+      "properties": {
+        "revenue": {
+          "type": "string"
+        },
+        "profit": {
+          "type": "string"
+        },
+        "expenses": {
+          "type": "string"
+        }
+      }
+    },
+    "trends": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Financial trends identified"
+    },
+    "riskFactors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Identified risk factors"
+    },
+    "recommendations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Strategic recommendations"
+    }
+  },
+  "required": ["financialMetrics", "trends", "riskFactors", "recommendations"]
+}
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### Test 4: Check API status
+GET http://localhost:8000/
+
+###
+
+### Test 5: Error test - Invalid JSON schema
+POST http://localhost:8000/process_document
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="files"; filename="sample.pdf"
+Content-Type: application/pdf
+
+< ./sample.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="deployment_name"
+
+gpt-4o
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="instructions"
+
+Extract topics from the document.
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="schema"
+
+{
+  "type": "object"
+  "properties": {
+    "topics": {
+      "type": "array"
+    }
+  }
+  // Missing commas - invalid JSON
+}
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### Test 6: Text file processing
+POST http://localhost:8000/process_document
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="files"; filename="sample.txt"
+Content-Type: text/plain
+
+< ./sample.txt
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="deployment_name"
+
+gpt-4o
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="instructions"
+
+Analyze the sentiment and extract entities from this text document.
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="schema"
+
+{
+  "type": "object",
+  "properties": {
+    "sentiment": {
+      "type": "string",
+      "enum": ["positive", "negative", "neutral"],
+      "description": "Overall sentiment of the text"
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["person", "organization", "location", "other"]
+          }
+        }
+      },
+      "description": "Named entities found in the text"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Confidence score for the analysis"
+    }
+  },
+  "required": ["sentiment", "entities", "confidence"]
+}
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
